@@ -1,48 +1,48 @@
-# Nuxt Example
+<p align="center">
+  <a href="https://github.com/maximoospital/menstrualcalc-demo">
+      <h3 align="center">MenstrualCalc-Demo</h3> 
+  </a>
+  <h5 align="center">Maximo Ospital, 2024</h5>
+  <h3 align="center"><a href="https://menstrualcalc-demo.vercel.app/">Visit Here!</a></h3>
+  <br/>
+</p>
 
-Deploy your [Nuxt](https://nuxt.com) project to Vercel with zero configuration.
+## Table of Contents
+* [About the Project](#About-The-Project)
+* [Built With](#Built-With)
+* [Getting Started](#getting-started)
+  * [Prerequisites](#Prerequisites)
+  * [Installation](#Installation)
+  
+## About the Project
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/vercel/tree/main/examples/nuxtjs&template=nuxtjs)
+![Screen Shot](https://i.imgur.com/39kSC0u.png) 
 
-_Live Example: https://nuxtjs-template.vercel.app_
+A remake of [This calculator](https://www.ladysoft.cl/calculadora-de-periodo), in NuxtJS, with Google Calendar features added.
 
-Look at the [Nuxt 3 documentation](https://v3.nuxtjs.org) to learn more.
+Features:
+- Responsive design.
+ 
+## Built With
+* [NuxtJS](https://nuxt.com/)
 
-## Setup
+## Getting Started
 
-Make sure to install the dependencies:
+### Prerequisites
+- NodeJS
 
-```bash
-# yarn
-yarn
+### Installation
 
-# npm
-npm install
-
-# pnpm
-pnpm install --shamefully-hoist
+1. Clone repo
+```sh
+git clone https://github.com/maximoospital/menstrualcalc-demo.git
 ```
 
-## Development Server
+2. Run npm install to install packages
 
-Start the development server on http://localhost:3000
+3. Run npm run dev to locally host.
 
-```bash
-npm run dev
-```
 
-## Production
 
-Build the application for production:
-
-```bash
-npm run build
-```
-
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Checkout the [deployment documentation](https://nuxt.com/docs/getting-started/deployment#presets) for more information.
+------
+[![Logo](https://i.imgur.com/XlF4lM5.png)](https://maximoospital.xyz) 
