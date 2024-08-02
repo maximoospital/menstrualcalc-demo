@@ -50,7 +50,7 @@
             <button class="submit" id="botoncalc" @click="submitButton">CALCULATE</button>
           </div>
         </div>
-      <div v-if="showCalendar" class="calendars-container">
+      <div v-if="showCalendar" class="calendars-container" id="calendar">
           <div class="month-buttons">
             <button class="previous-month" @click="previousMonth">&#60;- PREVIOUS</button>
             <div></div>
@@ -59,7 +59,16 @@
           <div class="mt-1">
             <calc-calendar :monthyear="selectedMonthYear" :events="events"></calc-calendar>
           </div>
-          <div class="input-selects">
+          <div class="ad" v-if="showAds">
+            <h1>¡Falta poco para el Periodo!</h1>
+            <h2>Ladysoft te Recomienda:</h2>
+            <div class="input-selects">
+              <img src="/normal.png" alt="Normal" style="width: 250px;">
+              <img src="/proteccion.png" alt="Proteccion" style="width: 250px;">
+              <img src="/telasuave.png" alt="Tela Suave" style="width: 250px;">
+            </div>
+          </div>
+          <div class="input-selects" id="cal-but">
             <div style="text-align: center; margin-top: 5px;">
               <p style="color:#ff3766; margin-bottom: 0;">■ - Period</p>
               <button class="submit" style="background-color:#ff3766;" @click="exportToGoogleCalendar('Periodo')">Export to Google Calendar</button>
@@ -94,6 +103,7 @@ export default {
       firstRun: true,
       showCalendar: false,
       selectedMonthYear: '',
+      showAds: false,
       maxFutureDate: new Date(),
       maxPastDate: new Date(),
       events: []
@@ -103,13 +113,18 @@ export default {
     formatDate(date) {
       const d = new Date(date);
       let month = '' + (d.getMonth() + 1);
-      let day = '' + d.getDate();
+      let day = '' + (d.getDate());
       const year = d.getFullYear();
 
       if (month.length < 2) month = '0' + month;
       if (day.length < 2) day = '0' + day;
 
       return [year, month, day].join('-');
+    },
+    getCorrectDate(date) {
+      const adjustedDate = new Date(date);
+      adjustedDate.setMinutes(adjustedDate.getMinutes() + adjustedDate.getTimezoneOffset());
+      return adjustedDate;
     },
     event(date, length, title, color) {
       return {
@@ -125,6 +140,8 @@ export default {
     addCycle(startDate, periodoLength) {
       let date = new Date(startDate);
       let periodLength = parseInt(periodoLength);
+      let cycleLength = parseInt(this.cycleLength);
+      this.cycleLength = cycleLength;
       let autoExamDate = new Date(date);
       autoExamDate.setDate(date.getDate() + periodLength + 1);
       let ovulationDate = new Date(date);
@@ -133,11 +150,43 @@ export default {
       this.addEvent(this.formatDate(autoExamDate), 1, 'Autoexamen', '#f888a1');
       this.addEvent(this.formatDate(ovulationDate), 5, 'Ovulacion', '#7f3766');
     },
+    DoesDateStartPeriod(date) {
+      let periodEvents = this.events.filter(event => event.title === 'Periodo');
+      return periodEvents.some( event => event.start === this.formatDate(date) );
+    },
+    showAd() {
+      let today = new Date();
+      let todayFiveDaysFromNow = new Date();
+      todayFiveDaysFromNow.setDate(today.getDate() + 5);
+      today = this.getCorrectDate(this.formatDate(today));
+      todayFiveDaysFromNow = this.getCorrectDate(this.formatDate(todayFiveDaysFromNow));
+      for(let i = 0; i < 5; i++) {
+        if(this.DoesDateStartPeriod(today)) {
+          this.showAds = true;
+          this.$nextTick(() => {
+            const adElement = document.querySelector('.ad');
+            if (adElement) {
+              setTimeout(() => {
+                adElement.classList.add('visible');
+              }, 20);
+              setTimeout(() => {
+                document.querySelector('.ad').scrollIntoView({ behavior: 'smooth' });
+              }, 20); // Wait for the opacity transition to complete
+            }
+          });
+          break;
+        } else {
+          this.showAds = false;
+        }
+        today.setDate(today.getDate() + 1);
+        document.querySelector('#calendar').scrollIntoView({ behavior: 'smooth' });
+      }
+    },
     submitButton() {
       this.events = [];
-      let preCycle = new Date(this.startDate);
-      this.addCycle(this.startDate, this.periodLength);
-      let postCycle = new Date(this.startDate);
+      let preCycle = new Date(this.getCorrectDate(this.startDate));
+      this.addCycle(this.getCorrectDate(this.startDate), this.periodLength);
+      let postCycle = new Date(this.getCorrectDate(this.startDate));
       for (let i = 0; i < 66; i++) {
         postCycle.setDate(postCycle.getDate() + this.cycleLength + 1);
         this.addCycle(this.formatDate(postCycle), this.periodLength);
@@ -146,13 +195,15 @@ export default {
         preCycle.setDate(preCycle.getDate() - this.cycleLength - 1);
         this.addCycle(this.formatDate(preCycle), this.periodLength);
       };
-      this.selectedMonthYear = this.startDate.substring(0, 7);
-      this.maxFutureDate = new Date(this.startDate);
+      this.selectedMonthYear = this.formatDate(this.getCorrectDate(this.startDate)).substring(0, 7);
+      this.maxFutureDate = new Date(this.getCorrectDate(this.startDate));
       this.maxFutureDate.setFullYear(this.maxFutureDate.getFullYear() + 5);
-      this.maxPastDate = new Date(this.startDate);
+      this.maxPastDate = new Date(this.getCorrectDate(this.startDate));
       this.maxPastDate.setFullYear(this.maxPastDate.getFullYear() - 5);
-      console.log(this.events);
       this.showCalendar = true;
+      this.$nextTick(() => {
+        this.showAd();
+      });
     },
     nextMonth() {
       this.showCalendar = false;
@@ -193,42 +244,38 @@ export default {
       this.showCalendar = true;
     },
     exportToGoogleCalendar(eventType = '') {
-      const cycleStartDate = new Date(this.startDate);
-      const cycleEndDate = new Date(cycleStartDate);
-      cycleEndDate.setDate(cycleEndDate.getDate() + this.cycleLength + 1);
-      console.log(cycleStartDate, cycleEndDate);
-
-      const events = this.events.filter(event => {
-        const eventDate = new Date(event.start);
-        return eventDate >= cycleStartDate && eventDate < cycleEndDate;
-      }).filter(event => {
-        return eventType ? event.title === eventType : true;
-      });
-      console.log(events);
-
-      if (events.length === 0) {
-        alert('No events to export for this cycle.');
-        return;
+      const baseUrl = 'https://calendar.google.com/calendar/r/eventedit';
+      switch (eventType) {
+        case 'Periodo':
+          let periodStart = this.startDate;
+          let periodEnd = new Date(this.startDate);
+          periodEnd.setDate(periodEnd.getDate() + this.periodLength);
+          periodEnd = this.getCorrectDate(periodEnd).toISOString().replace(/-|:|\.\d\d\d/g, '');
+          periodStart = this.getCorrectDate(periodStart).toISOString().replace(/-|:|\.\d\d\d/g, '');
+          window.open(`${baseUrl}?text=${encodeURIComponent(eventType)}&dates=${periodStart}/${periodEnd}`, '_blank');
+          break;
+        case 'Autoexamen':
+          let selfExamStart = new Date(this.startDate);
+          let selfExamEnd = new Date(this.startDate);
+          selfExamStart.setDate(selfExamStart.getDate() + this.periodLength + 1);
+          selfExamStart = this.getCorrectDate(selfExamStart).toISOString().replace(/-|:|\.\d\d\d/g, '');
+          selfExamEnd.setDate(selfExamEnd.getDate() + this.periodLength + 2);
+          selfExamEnd = this.getCorrectDate(selfExamEnd).toISOString().replace(/-|:|\.\d\d\d/g, '');
+          window.open(`${baseUrl}?text=${encodeURIComponent(eventType)}&dates=${selfExamStart}/${selfExamEnd}`, '_blank');
+          break;
+        case 'Ovulacion':
+          let ovulationStart = new Date(this.startDate);
+          let ovulationEnd = new Date(this.startDate);
+          ovulationStart.setDate(ovulationStart.getDate() + this.cycleLength + 1 - 18);
+          ovulationStart = this.getCorrectDate(ovulationStart).toISOString().replace(/-|:|\.\d\d\d/g, '');
+          ovulationEnd.setDate(ovulationEnd.getDate() + this.cycleLength + 1 - 13);
+          ovulationEnd = this.getCorrectDate(ovulationEnd).toISOString().replace(/-|:|\.\d\d\d/g, '');
+          window.open(`${baseUrl}?text=${encodeURIComponent(eventType)}&dates=${ovulationStart}/${ovulationEnd}`, '_blank');
+          break;
+        default:
+          break;
       }
-      if (eventType === 'Autoexamen') {
-       const baseUrl = 'https://calendar.google.com/calendar/r/eventedit';
-       events.forEach(event => {
-        const startDate = new Date(event.start).toISOString().replace(/-|:|\.\d\d\d/g, '');
-        const url = `${baseUrl}?text=${encodeURIComponent(event.title)}&dates=${startDate}/${startDate}`;
-        window.open(url, '_blank');
-       });
-      } else {
-        const baseUrl = 'https://calendar.google.com/calendar/r/eventedit';
-        events.forEach(event => {
-        const startDate = new Date(event.start).toISOString().replace(/-|:|\.\d\d\d/g, '');
-        const endDate = new Date(event.end).toISOString().replace(/-|:|\.\d\d\d/g, ''); // 1 hour event
-        const url = `${baseUrl}?text=${encodeURIComponent(event.title)}&dates=${startDate}/${endDate}`;
-        window.open(url, '_blank');
-        });
-      }
-    }
-
-
+   }
   }
 }
 </script>
@@ -282,6 +329,7 @@ export default {
     height: 3rem; 
     font-weight: 700; 
     color: #ffffff; 
+    cursor: pointer;
     background: #7f3766;
   }
   .submit:hover {
@@ -321,5 +369,27 @@ export default {
   }
   .next-month:hover {
     font-weight: 700; 
+  }
+  .ad {
+    text-align: center;
+    font-size: 28px;
+    color: #ffffff;
+    text-shadow: 2px 3px 2px #f888a1;
+    line-height: 35px;
+    font-weight: 700;
+    padding: 20px;
+    margin: 10px;
+    background-color: #ff3766;
+    border-radius: 25px;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+  }
+  .ad.visible {
+  opacity: 1;
+  }
+  .ad h2 {
+    font-size: 24px;
+    color: #ffffff;
+    font-weight: 700;
   }
 </style>

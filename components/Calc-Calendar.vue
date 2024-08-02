@@ -16,6 +16,9 @@
           {{ day }}
         </div>
       </div>
+      <div class="lunar">
+        <h5>{{ getLunarPhases(monthyear) }}</h5>
+      </div>
     </div>
     <div class="calendar">
       <div class="month">
@@ -32,6 +35,9 @@
         <div v-for="day in nextDaysInMonth" :key="day" :style="getEventStyle(day, nextMonthYear)" class="calendar-day">
           {{ day }}
         </div>
+      </div>
+      <div class="lunar">
+        <h5>{{ getLunarPhases(nextMonthYear) }}</h5>
       </div>
     </div>
   </div>
@@ -107,7 +113,75 @@ export default {
     const [year, month] = monthyear.split('-');
     const date = new Date(year, month - 1, 1);
     return date.toLocaleString('default', { month: 'long', year: 'numeric' });
-  }
+  },
+  getCorrectDate(date) {
+      const adjustedDate = new Date(date);
+      adjustedDate.setMinutes(adjustedDate.getMinutes() + adjustedDate.getTimezoneOffset());
+      return adjustedDate;
+  },
+  getLunarPhases(monthyear) {
+      const [year, month] = monthyear.split('-').map(Number);
+      const lunarCycle = 29.53058867; // Average lunar cycle in days
+      const newMoonReference = this.getCorrectDate(new Date(2000, 0, 6, 18, 14, 0)); // Reference new moon date (January 6, 2000)
+      
+      // Helper function to calculate the phase date
+      const calculatePhaseDate = (referenceDate, daysOffset) => {
+        const phaseDate = new Date(referenceDate.getTime() + daysOffset * 86400000);
+        return phaseDate;
+      };
+
+      // Calculate the start date of the given month
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
+
+      // Find the closest new moon date before the start of the month
+      let currentNewMoon = newMoonReference;
+      while (currentNewMoon < startDate) {
+        currentNewMoon = calculatePhaseDate(currentNewMoon, lunarCycle);
+      }
+      currentNewMoon = calculatePhaseDate(currentNewMoon, -lunarCycle);
+
+      // Calculate the phases within the month
+      const phases = [];
+      while (currentNewMoon <= endDate) {
+        let newMoonDate = new Date(currentNewMoon);
+        if (newMoonDate.getDate() !== 1) {
+          newMoonDate = calculatePhaseDate(newMoonDate, -1); // Set one day earlier if not the first day
+        }
+        phases.push({
+          phase: 'New Moon',
+          symbol: '🌑',
+          date: newMoonDate // Set one day earlier
+        });
+        phases.push({
+          phase: 'First Quarter',
+          symbol: '🌓',
+          date: calculatePhaseDate(currentNewMoon, lunarCycle / 4)
+        });
+        phases.push({
+          phase: 'Full Moon',
+          symbol: '🌕',
+          date: calculatePhaseDate(currentNewMoon, (lunarCycle / 2) - 1)
+        });
+        phases.push({
+          phase: 'Third Quarter',
+          symbol: '🌗',
+          date: calculatePhaseDate(currentNewMoon, (3 * lunarCycle) / 4 - 1) // Set one day earlier
+        });
+        currentNewMoon = calculatePhaseDate(currentNewMoon, lunarCycle);
+      }
+
+      // Filter phases to only include those within the given month
+      const filteredPhases = phases.filter(phase => phase.date >= startDate && phase.date <= endDate);
+
+      // Format the output
+      const output = filteredPhases.map(phase => {
+        const day = phase.date.getDate();
+        return `${day}: ${phase.symbol}`;
+      }).join(' | ');
+
+      return output;
+    }
 }
 }
 </script>
@@ -151,8 +225,19 @@ export default {
   border-bottom: 1px solid #ccc;
 }
 
+.lunar {
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  font-size: 20px;
+  padding: 0px;
+  margin: 0px;
+  padding-bottom: 0px;
+  border-top: 1px solid #ccc;
+}
+
 h5 {
-  margin: 5px;
+  margin: 0px;
   padding: 10px;
 }
 
