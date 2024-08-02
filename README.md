@@ -21,7 +21,10 @@
 A remake of [This calculator](https://www.ladysoft.cl/calculadora-de-periodo), in NuxtJS, with Google Calendar features added.
 
 Features:
-- Responsive design.
+- Google Calendar exporting
+- Lunar calendar dates
+- Ads
+
  
 ## Built With
 * [NuxtJS](https://nuxt.com/)
