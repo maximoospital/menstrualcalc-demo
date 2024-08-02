@@ -60,8 +60,8 @@
             <calc-calendar :monthyear="selectedMonthYear" :events="events"></calc-calendar>
           </div>
           <div class="ad" v-if="showAds">
-            <h1>¡Falta poco para el Periodo!</h1>
-            <h2>Ladysoft te Recomienda:</h2>
+            <h1>Period is Almost Here!</h1>
+            <h2>Ladysoft recommends:</h2>
             <div class="input-selects">
               <img src="/normal.png" alt="Normal" style="width: 250px;">
               <img src="/proteccion.png" alt="Proteccion" style="width: 250px;">
