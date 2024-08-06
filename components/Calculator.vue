@@ -144,7 +144,6 @@ export default {
       let dayFut = String(twoYearsFromNow.getDate()).padStart(2, '0');
       this.maxDate = `${yearFut}-${monthFut}-${dayFut}`;
       console.log(this.minDate, this.maxDate);
-      
     },
     event(date, length, title, color) {
       return {
