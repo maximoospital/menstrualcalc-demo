@@ -4,7 +4,7 @@
           <div class="input-selects">
             <div>
               <label for="start-date" class="input-label" style="color: #ff3766;">Last Period</label>
-              <input type="date" id="start-date" name="start-date" class="date-select" :min="minDate" v-model="startDate">
+              <input type="date" id="start-date" name="start-date" class="date-select" :min="minDate" :max="maxDate" v-model="startDate">
             </div>
             <div>
               <label for="period-length" class="input-label" style="color: #ff3766;">Period Length</label>
@@ -105,13 +105,14 @@ export default {
       selectedMonthYear: '',
       showAds: false,
       minDate: '',
+      maxDate: '',
       maxFutureDate: new Date(),
       maxPastDate: new Date(),
       events: []
     }
   },
   created() {
-    this.setMinDate();
+    this.setMinAndMaxDate();
   },
   methods: {
     formatDate(date) {
@@ -130,13 +131,20 @@ export default {
       adjustedDate.setMinutes(adjustedDate.getMinutes() + adjustedDate.getTimezoneOffset());
       return adjustedDate;
     },
-    setMinDate() {
-      const today = new Date();
-      const twoYearsAgo = new Date(today.setFullYear(today.getFullYear() - 2));
-      const year = twoYearsAgo.getFullYear();
-      const month = String(twoYearsAgo.getMonth() + 1).padStart(2, '0');
-      const day = String(twoYearsAgo.getDate()).padStart(2, '0');
+    setMinAndMaxDate() {
+      let today = new Date();
+      let twoYearsAgo = new Date(today.setFullYear(today.getFullYear() - 2));
+      let year = twoYearsAgo.getFullYear();
+      let month = String(twoYearsAgo.getMonth() + 1).padStart(2, '0');
+      let day = String(twoYearsAgo.getDate()).padStart(2, '0');
       this.minDate = `${year}-${month}-${day}`;
+      let twoYearsFromNow = new Date(today.setFullYear(today.getFullYear() + 4));
+      let yearFut = twoYearsFromNow.getFullYear();
+      let monthFut = String(twoYearsFromNow.getMonth() + 1).padStart(2, '0');
+      let dayFut = String(twoYearsFromNow.getDate()).padStart(2, '0');
+      this.maxDate = `${yearFut}-${monthFut}-${dayFut}`;
+      console.log(this.minDate, this.maxDate);
+      
     },
     event(date, length, title, color) {
       return {

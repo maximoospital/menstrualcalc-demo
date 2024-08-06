@@ -3,8 +3,8 @@ import fs from 'fs';
 
 async function scrape() {
     let currentYear = new Date().getFullYear();
-    let startYear = currentYear - 2;
-    let endYear = currentYear + 2;
+    let startYear = currentYear - 5;
+    let endYear = currentYear + 5;
     let allItems = [];
 
     const browser = await puppeteer.launch();
