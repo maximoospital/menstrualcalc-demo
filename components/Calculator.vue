@@ -4,7 +4,7 @@
           <div class="input-selects">
             <div>
               <label for="start-date" class="input-label" style="color: #ff3766;">Last Period</label>
-              <input type="date" id="start-date" name="start-date" class="date-select" v-model="startDate">
+              <input type="date" id="start-date" name="start-date" class="date-select" :min="minDate" v-model="startDate">
             </div>
             <div>
               <label for="period-length" class="input-label" style="color: #ff3766;">Period Length</label>
@@ -104,10 +104,14 @@ export default {
       showCalendar: false,
       selectedMonthYear: '',
       showAds: false,
+      minDate: '',
       maxFutureDate: new Date(),
       maxPastDate: new Date(),
       events: []
     }
+  },
+  created() {
+    this.setMinDate();
   },
   methods: {
     formatDate(date) {
@@ -125,6 +129,14 @@ export default {
       const adjustedDate = new Date(date);
       adjustedDate.setMinutes(adjustedDate.getMinutes() + adjustedDate.getTimezoneOffset());
       return adjustedDate;
+    },
+    setMinDate() {
+      const today = new Date();
+      const twoYearsAgo = new Date(today.setFullYear(today.getFullYear() - 2));
+      const year = twoYearsAgo.getFullYear();
+      const month = String(twoYearsAgo.getMonth() + 1).padStart(2, '0');
+      const day = String(twoYearsAgo.getDate()).padStart(2, '0');
+      this.minDate = `${year}-${month}-${day}`;
     },
     event(date, length, title, color) {
       return {
@@ -187,19 +199,19 @@ export default {
       let preCycle = new Date(this.getCorrectDate(this.startDate));
       this.addCycle(this.getCorrectDate(this.startDate), this.periodLength);
       let postCycle = new Date(this.getCorrectDate(this.startDate));
-      for (let i = 0; i < 66; i++) {
+      for (let i = 0; i < 30; i++) {
         postCycle.setDate(postCycle.getDate() + this.cycleLength + 1);
         this.addCycle(this.formatDate(postCycle), this.periodLength);
       };
-      for (let i = 0; i > -66; i--) {
+      for (let i = 0; i > -30; i--) {
         preCycle.setDate(preCycle.getDate() - this.cycleLength - 1);
         this.addCycle(this.formatDate(preCycle), this.periodLength);
       };
       this.selectedMonthYear = this.formatDate(this.getCorrectDate(this.startDate)).substring(0, 7);
       this.maxFutureDate = new Date(this.getCorrectDate(this.startDate));
-      this.maxFutureDate.setFullYear(this.maxFutureDate.getFullYear() + 5);
+      this.maxFutureDate.setFullYear(this.maxFutureDate.getFullYear() + 2);
       this.maxPastDate = new Date(this.getCorrectDate(this.startDate));
-      this.maxPastDate.setFullYear(this.maxPastDate.getFullYear() - 5);
+      this.maxPastDate.setFullYear(this.maxPastDate.getFullYear() - 2);
       this.showCalendar = true;
       this.$nextTick(() => {
         this.showAd();
@@ -307,9 +319,11 @@ export default {
     border-radius: 0; 
     width: 100%; 
     height: 3rem; 
+    font-size: 18px;
     font-weight: 700; 
     color: #ffffff; 
     background: #ff3766;
+    cursor: pointer;
   }
   .number-select {
     display: block; 
@@ -318,22 +332,42 @@ export default {
     width: 100%; 
     height: 3rem; 
     font-weight: 700; 
+    font-size: 18px;
     text-align: center; 
     color: #ffffff; 
     background: #ff3766;
+    cursor: pointer;
   }
   .submit {
-    display: block; 
     border-radius: 0; 
     width: 100%; 
+    z-index: 1;
+    display: inline-block;
+    position: relative;
     height: 3rem; 
     font-weight: 700; 
     color: #ffffff; 
-    cursor: pointer;
     background: #7f3766;
   }
   .submit:hover {
+    color: #fff;
+    cursor: pointer;
+  }
+  .submit:after {
     background-color: #000000; 
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    transition: all .3s ease;
+    -webkit-transition: all .3s ease;
+  }
+  .submit:hover:after{
+    top: 0;
+    height: 100%;
   }
   .calendars-container {
     display: grid;
@@ -378,7 +412,7 @@ export default {
     line-height: 35px;
     font-weight: 700;
     padding: 20px;
-    margin: 10px;
+    margin: 10px 0px 10px 0px;
     background-color: #ff3766;
     border-radius: 25px;
     opacity: 0;

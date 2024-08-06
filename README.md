@@ -18,12 +18,15 @@
 
 ![Screen Shot](https://i.imgur.com/39kSC0u.png) 
 
-A remake of [This calculator](https://www.ladysoft.cl/calculadora-de-periodo), in NuxtJS, with Google Calendar features added.
+A remake of [This calculator](https://www.ladysoft.cl/calculadora-de-periodo), in NuxtJS, with new features added.
 
 Features:
 - Google Calendar exporting
-- Lunar calendar dates
-- Ads
+- Lunar calendar dates, obtained scraping from Timeanddate utilizing Puppeteer and storing in a .json
+- Ad banner in case Period is coming soon
+- Timezone offset calculations
+- Button and scroll animations
+- Styled imitating the original site
 
  
 ## Built With

@@ -2,16 +2,28 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
+    "build": "node scrape.js && nuxt build",
+    "dev": "node scrape.js && nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "scrape": "node scrape.js"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.0.3",
     "nuxt": "^3.8.2",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false,
+    "tls": false
+  },
+  "dependencies": {
+    "net": "^1.0.2",
+    "puppeteer": "^22.15.0",
+    "tls": "^0.0.1"
   }
 }
