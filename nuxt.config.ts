@@ -1,11 +1,22 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import { defineNuxtConfig } from 'nuxt/config'
+
 export default defineNuxtConfig({
+  // serve everything under /translator/
+  app: {
+    baseURL: '/menstrualcalc-demo/'
+  },
+
+  // prefix all webpack‐built assets with /translator/_nuxt/
+  build: {
+    publicPath: '/menstrualcalc-demo/_nuxt/'
+  },
+
   devtools: { enabled: true },
 
   routeRules: {
-    // prerender index route by default
     '/': { prerender: true },
   },
 
-  compatibilityDate: '2024-08-03',
-});
+  // Ensure compatibility date 
+  compatibilityDate: '2024-08-11',
+})
