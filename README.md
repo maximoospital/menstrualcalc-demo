@@ -3,7 +3,7 @@
       <h3 align="center">MenstrualCalc-Demo</h3> 
   </a>
   <h5 align="center">Maximo Ospital, 2024</h5>
-  <h3 align="center"><a href="https://menstrualcalc-demo.vercel.app/">Visit Here!</a></h3>
+  <h3 align="center"><a href="https://maximoospital.xyz/menstrualcalc-demo/">Visit Here!</a></h3>
   <br/>
 </p>
 
